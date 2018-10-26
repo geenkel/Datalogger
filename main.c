@@ -64,7 +64,6 @@ int main(void)
 
         }
 
-
         if(getSampleFlag)
         {
             getSampleFlag = 0;
