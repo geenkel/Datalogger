@@ -1,0 +1,1 @@
+"./main.obj" "./includes/batteryMonitor.obj" "./includes/i2c.obj" "./includes/rtc.obj" "./includes/serial.obj" "./includes/sht20.obj" "./includes/storage.obj" "../lnk_msp430fr5848.cmd" -llibmpu_init.a -llibmath.a -llibc.a 
