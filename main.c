@@ -46,7 +46,9 @@ int main(void)
     serialIni();
 
     //RTC ini
-    //RTCInit(30, 30, 10, 15, 6, 2018);
+    RTCInit(0, 0, 0, 0, 0, 0);
+    RTCCTL01 = RTCHOLD;
+    initializedRtc = 0;
 
    //sht20 sensor Ini();
     sht20Ini();
@@ -59,13 +61,12 @@ int main(void)
         __disable_interrupt();
         if(!(int_second | cmd_ready | getSampleFlag | int_hour))
         {
-            __bis_SR_register(LPM0_bits + GIE);
+            __bis_SR_register(LPM3_bits + GIE);
         }
 
         if(int_second)
         {
             int_second = 0;
-
         }
 
         if(getSampleFlag)

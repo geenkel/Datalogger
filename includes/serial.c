@@ -224,7 +224,7 @@ __interrupt void USCI_A0_ISR(void)
                         serial_count = 0;
                         cmd_ready = serial_buffer[0];
                         readCommand();
-                        __bic_SR_register_on_exit(LPM0_bits);
+                        __bic_SR_register_on_exit(LPM3_bits);
                     }
                     else
                     {

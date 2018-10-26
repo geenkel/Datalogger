@@ -1,6 +1,9 @@
 #include <msp430.h>
 #include "rtc.h"
 
+extern unsigned char samplingStarted = 0;
+unsigned char timeCounter = 0;
+
 void RTCInit(unsigned char seconds, unsigned char minutes, unsigned char hours, unsigned char day, unsigned char month,unsigned short year)
 {
     RTCCTL01 = RTCRDYIE  + RTCHOLD;
@@ -19,6 +22,10 @@ void RTCInit(unsigned char seconds, unsigned char minutes, unsigned char hours, 
     initializedRtc = 1;
 }
 
+void RTCsetAlamr(unsigned char )
+{
+
+}
 
 #pragma vector=RTC_VECTOR
 __interrupt void RTC_ISR(void)
@@ -27,11 +34,21 @@ __interrupt void RTC_ISR(void)
     case RTCIV_NONE: break;
     case RTCIV_RTCRDYIFG:
         int_second = 1;
-        getSampleFlag = 1;
-        __bic_SR_register_on_exit(LPM0_bits);
+
+        //__bic_SR_register_on_exit(LPM3_bits);
         break;
     case RTCIV_RTCTEVIFG:
         int_hour = 1;
+        if(samplingStarted)
+        {
+            timeCounter++;
+            if(timeCounter == numberOfTimeUnits)
+            {
+                getSampleFlag = 1;
+                timeCounter = 0;
+                __bic_SR_register_on_exit(LPM3_bits);
+            }
+        }
       break;
     case RTCIV_RTCAIFG: break;
     case RTCIV_RT0PSIFG: break;
