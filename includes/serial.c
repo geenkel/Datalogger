@@ -52,22 +52,7 @@ unsigned char readCommand()
 //            serialWrite(serial_buffer, 7);
             break;
         case CMD_REQUEST_DATE:
-            serial_buffer[0]=0xA0;
-            serial_buffer[1]=0xA1;
-            serial_buffer[2]=0;
-            serial_buffer[3]=9;
-            serial_buffer[4]=CMD_DEVICE_DATE;
-            RTCCTL0 &= ~RTCRDYIFG;
-            while(! (RTCCTL0 & RTCRDYIFG));
-            serial_buffer[5]=RTCSEC;
-            serial_buffer[6]=RTCMIN;
-            serial_buffer[7]=RTCHOUR;
-            serial_buffer[8]=RTCDAY;
-            serial_buffer[9]=RTCMON;
-            serial_buffer[10]=RTCYEAR_H;
-            serial_buffer[11]=RTCYEAR_L;
-            serial_buffer[12] = calcChecksum(serial_buffer+4,8);
-            serialWrite(serial_buffer, 13);
+
             break;
         case CMD_REQUEST_METADATA:
             cmd_ready =CMD_REQUEST_METADATA;

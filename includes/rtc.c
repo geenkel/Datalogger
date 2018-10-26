@@ -16,6 +16,7 @@ void RTCInit(unsigned char seconds, unsigned char minutes, unsigned char hours, 
 
     RTCCTL01 &= ~(RTCHOLD);                   // Start RTC calendar mode
     RTCCTL0 |= RTCRDYIE + RTCTEVIE;
+    initializedRtc = 1;
 }
 
 

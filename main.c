@@ -16,11 +16,15 @@ unsigned char cmd_ready;
 unsigned char int_second = 0;
 unsigned char int_hour = 0;
 unsigned char getSampleFlag;
+unsigned char initializedRtc = 0;
 
 unsigned char send_metadata();
 unsigned char send_data();
 unsigned char sendBatt();
 void initPorts();
+void send_date();
+
+
 
 unsigned char battLevel = 255;
 
@@ -84,6 +88,9 @@ int main(void)
                     break;
                 case CMD_READ_DATA:
                     send_data();
+                    break;
+                case CMD_REQUEST_DATE:
+                    send_date();
                     break;
             }
             cmd_ready = 0;
@@ -159,6 +166,42 @@ void initPorts()
 
     PM5CTL0 &= ~LOCKLPM5;
 }
+
+
+void send_date()
+{
+    serial_buffer[0]=0xA0;
+    serial_buffer[1]=0xA1;
+    serial_buffer[2]=0;
+    serial_buffer[3]=9;
+    serial_buffer[4]=CMD_DEVICE_DATE;
+    if(initializedRtc){
+        RTCCTL0 &= ~RTCRDYIFG;
+        while(! (RTCCTL0 & RTCRDYIFG));
+        serial_buffer[5]=RTCSEC;
+        serial_buffer[6]=RTCMIN;
+        serial_buffer[7]=RTCHOUR;
+        serial_buffer[8]=RTCDAY;
+        serial_buffer[9]=RTCMON;
+        serial_buffer[10]=RTCYEAR_H;
+        serial_buffer[11]=RTCYEAR_L;
+    }
+    else
+    {
+        serial_buffer[5]=0;
+        serial_buffer[6]=0;
+        serial_buffer[7]=0;
+        serial_buffer[8]=0;
+        serial_buffer[9]=0;
+        serial_buffer[10]=0;
+        serial_buffer[11]=0;
+    }
+
+    serial_buffer[12] = calcChecksum(serial_buffer+4,8);
+    serialWrite(serial_buffer, 13);
+}
+
+
 
 void iniClocks()
 {
