@@ -17,6 +17,7 @@ unsigned char int_second = 0;
 unsigned char int_hour = 0;
 unsigned char getSampleFlag;
 unsigned char initializedRtc = 0;
+unsigned char samplingProgramed = 0;
 
 unsigned char send_metadata();
 unsigned char send_data();
@@ -35,8 +36,6 @@ int main(void)
     WDTCTL = WDTPW | WDTHOLD;                 // Stop Watchdog
     initPorts();
     iniClocks();
-    //delay for sensor init
-    __delay_cycles(5000);
 
     P1DIR |= BIT2;
     PM5CTL0 &= ~LOCKLPM5;
@@ -47,7 +46,6 @@ int main(void)
 
     //RTC ini
     RTCInit(0, 0, 0, 0, 0, 0);
-    RTCCTL01 = RTCHOLD;
     initializedRtc = 0;
 
    //sht20 sensor Ini();
@@ -101,6 +99,14 @@ int main(void)
         {
             int_hour = 0;
             getBattLevel(&battLevel);
+            //Check sampling start and enable alarm
+            if(samplingProgramed)
+            {
+                if(memory.storage.metadata.initial_date.hours == RTCHOUR)
+                {
+
+                }
+            }
         }
 
     }//end while

@@ -22,7 +22,7 @@ void RTCInit(unsigned char seconds, unsigned char minutes, unsigned char hours, 
     initializedRtc = 1;
 }
 
-void RTCsetAlamr(unsigned char )
+void RTCsetAlamr(unsigned char asd)
 {
 
 }
@@ -39,18 +39,17 @@ __interrupt void RTC_ISR(void)
         break;
     case RTCIV_RTCTEVIFG:
         int_hour = 1;
-        if(samplingStarted)
-        {
-            timeCounter++;
-            if(timeCounter == numberOfTimeUnits)
-            {
-                getSampleFlag = 1;
-                timeCounter = 0;
-                __bic_SR_register_on_exit(LPM3_bits);
-            }
-        }
+        __bic_SR_register_on_exit(LPM3_bits);
       break;
-    case RTCIV_RTCAIFG: break;
+    case RTCIV_RTCAIFG:
+        timeCounter++;
+//        if(timeCounter == numberOfTimeUnits)
+//        {
+//            getSampleFlag = 1;
+//            timeCounter = 0;
+//            __bic_SR_register_on_exit(LPM3_bits);
+//        }
+//        break;
     case RTCIV_RT0PSIFG: break;
     case RTCIV_RT1PSIFG: break;
     case RTCIV_RTCOFIFG: break;
