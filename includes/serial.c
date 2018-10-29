@@ -223,6 +223,7 @@ __interrupt void USCI_A0_ISR(void)
                         reading_command = 0;
                         serial_count = 0;
                         cmd_ready = serial_buffer[0];
+                        UCA0IE &= ~UCRXIE;
                         readCommand();
                         __bic_SR_register_on_exit(LPM3_bits);
                     }

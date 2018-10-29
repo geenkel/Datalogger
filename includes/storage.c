@@ -24,7 +24,7 @@ void setFreq(unsigned short frequency, unsigned short frequency_unit)
     memory.storage.metadata.frequency = frequency_unit;
 }
 
-void saveSample(short temperature, unsigned char humidity)
+unsigned char saveSample(short temperature, unsigned char humidity)
 {
     if(memory.storage.metadata.active)
     {
@@ -34,8 +34,14 @@ void saveSample(short temperature, unsigned char humidity)
             memory.storage.samples[currentAddr].humidity = humidity;
             currentAddr++;
             memory.storage.metadata.number_of_samples ++;
+            return 1;
+        }
+        else
+        {
+            return 0;   //Memoria llena
         }
     }
+    return 0;
 }
 
 unsigned char readStorageMetadata(unsigned char * buffer)

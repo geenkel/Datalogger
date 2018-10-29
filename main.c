@@ -22,6 +22,10 @@ unsigned char samplingProgramed = 0;
 unsigned char send_metadata();
 unsigned char send_data();
 unsigned char sendBatt();
+void configureSampling();
+void startSampling();
+
+
 void initPorts();
 void send_date();
 
@@ -45,7 +49,7 @@ int main(void)
     serialIni();
 
     //RTC ini
-    RTCInit(0, 0, 0, 0, 0, 0);
+    RTCInit(55,59, 10, 1, 1, 2018);
     initializedRtc = 0;
 
    //sht20 sensor Ini();
@@ -54,6 +58,12 @@ int main(void)
     battMonitorIni();
     getBattLevel(&battLevel);
 
+//    memory.storage.metadata.active = 1;
+//    memory.storage.metadata.frequency = 1;
+//    memory.storage.metadata.frequency_unit = MINUTES;
+//    memory.storage.metadata.number_of_samples = 0;
+//    RTCsetAlarm(1, 0, UNIT_SECONDS);
+    startSampling();
     while(1)
     {
         __disable_interrupt();
@@ -72,7 +82,10 @@ int main(void)
             getSampleFlag = 0;
             temperature = read_temperature();
             humidity = read_humidity();
-            saveSample(temperature, humidity);
+            if(!saveSample(temperature, humidity))
+            {
+                RTCCancelAlarm();
+            }
         }
 
         if(cmd_ready)
@@ -91,8 +104,14 @@ int main(void)
                 case CMD_REQUEST_DATE:
                     send_date();
                     break;
+                case CMD_CONFIGURE_SAMPLING:
+                    configureSampling();
+                case CMD_START_SAMPLING:
+                    startSampling();
+                    break;
             }
             cmd_ready = 0;
+            UCA0IE |= UCRXIE;
         }
 
         if(int_hour)
@@ -105,11 +124,48 @@ int main(void)
                 if(memory.storage.metadata.initial_date.hours == RTCHOUR)
                 {
 
+                    samplingProgramed = 0;
+                    //getSampleFlag = 1;
                 }
             }
         }
 
     }//end while
+}
+
+void configureSampling(){
+    samplingProgramed = 1;
+}
+
+void startSampling()
+{
+    if(initializedRtc)
+    {
+        memory.storage.metadata.active = 1;
+        memory.storage.metadata.frequency = serial_buffer[1];
+        memory.storage.metadata.frequency_unit = serial_buffer[2];
+        memory.storage.metadata.number_of_samples = 0;
+        while(! (RTCCTL01 & RTCCTL01));
+        memory.storage.metadata.initial_date.seconds = RTCSEC;
+        memory.storage.metadata.initial_date.minutes = RTCMIN;
+        memory.storage.metadata.initial_date.hours = RTCAHOUR;
+        memory.storage.metadata.initial_date.day = RTCDAY;
+        memory.storage.metadata.initial_date.month = RTCMON;
+        memory.storage.metadata.initial_date.year = RTCYEAR;
+        unsigned char offset = 0;
+
+        if(serial_buffer[2] == UNIT_HOURS)
+                offset = memory.storage.metadata.initial_date.minutes;
+
+        if(serial_buffer[2] == UNIT_DAYS)
+                offset = memory.storage.metadata.initial_date.hours;
+        RTCsetAlarm(serial_buffer[1], offset, serial_buffer[2]);
+        getSampleFlag = 1;
+        sendACK();
+    }
+    else{
+        //Send NACK message
+    }
 }
 
 unsigned char send_metadata()
@@ -183,8 +239,7 @@ void send_date()
     serial_buffer[3]=9;
     serial_buffer[4]=CMD_DEVICE_DATE;
     if(initializedRtc){
-        RTCCTL0 &= ~RTCRDYIFG;
-        while(! (RTCCTL0 & RTCRDYIFG));
+        while(! (RTCCTL01 & RTCCTL01));
         serial_buffer[5]=RTCSEC;
         serial_buffer[6]=RTCMIN;
         serial_buffer[7]=RTCHOUR;

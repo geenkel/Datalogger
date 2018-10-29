@@ -12,6 +12,8 @@
 #define CMD_REQUEST_DATE        0x14
 #define CMD_READ_DATA           0x15
 #define CMD_REQUEST_METADATA    0x16
+#define CMD_CONFIGURE_SAMPLING  0x17
+#define CMD_START_SAMPLING      0x18
 
 //Device TX commands
 #define CMD_SERIAL_NUMBER   0x20
@@ -29,5 +31,6 @@ void serialWrite(unsigned char *buffer, unsigned int length);
 unsigned char readCommand();
 unsigned char calcChecksum(unsigned char* buffer, unsigned int length);
 void serialPrint(char * string);
+void sendACK();
 
 #endif /* INCLUDES_SERIAL_H_ */

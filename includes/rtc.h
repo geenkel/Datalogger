@@ -1,9 +1,10 @@
 #ifndef INCLUDES_RTC_H_
 #define INCLUDES_RTC_H_
 
-#define UNIT_SECONDS
-#define UNIT_MINUTES
-#define UNIT_HOURS
+#define UNIT_SECONDS    1
+#define UNIT_MINUTES    2
+#define UNIT_HOURS      3
+#define UNIT_DAYS       4
 
 
 
@@ -13,6 +14,7 @@ extern unsigned char getSampleFlag;
 extern unsigned char initializedRtc;
 
 void RTCInit(unsigned char seconds, unsigned char minutes, unsigned char hours, unsigned char day, unsigned char month,unsigned short year);
-
+void RTCsetAlarm(unsigned char times, unsigned char offset, unsigned char u);
+void RTCCancelAlarm();
 
 #endif /* INCLUDES_RTC_H_ */

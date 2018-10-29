@@ -2,7 +2,7 @@
 #define INCLUDES_STORAGE_H_
 
 #define MINUTES     2
-#define MAX_SAMPLES 5
+#define MAX_SAMPLES 10000
 
 
 
@@ -51,7 +51,7 @@ extern union Memory memory;
 void initStorage();
 void setInitialDate(unsigned char seconds, unsigned char minutes, unsigned char hours, unsigned char day, unsigned char month, unsigned short year);
 void setFreq(unsigned short frequency, unsigned short frequency_unit);
-void saveSample(short temperature, unsigned char humidity);
+unsigned char saveSample(short temperature, unsigned char humidity);
 unsigned short readStorageData(unsigned char *buffer , unsigned short addr, unsigned short nSamples);
 unsigned char readStorageMetadata(unsigned char * buffer);
 
